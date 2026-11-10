@@ -12,4 +12,12 @@ export interface MovieResponse {
     total_pages: number;
     total_results: number;
 }
+export interface MovieDetails extends Movie {
+    runtime: number;
+    genres: Array<{
+        id: number;
+        name: string;
+    }>;
+    tagline: string;
+}
 //# sourceMappingURL=movie.types.d.ts.map

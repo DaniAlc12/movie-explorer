@@ -1,5 +1,6 @@
 import { getPopularMovies } from "./services/movie.service.js";
 import { searchMovies } from "./services/movie.service.js";
+import { getMovieDetails } from "./services/movie.service.js";
 const movieContainer = document.querySelector("#movies-container");
 //INICIAR LA APP Y MOSTRAR LAS PELICULAS
 const renderMovies = (movies) => {
@@ -46,13 +47,16 @@ searchInput?.addEventListener("input", (e) => {
     }, 500);
 });
 //CLICK EN PELICULA
-movieContainer?.addEventListener("click", (e) => {
+movieContainer?.addEventListener("click", async (e) => {
     const target = e.target;
     const card = target.closest(".movie-card");
     if (!card)
         return;
     const movieId = card.dataset.id;
-    console.log(`ID de la pelicula: ${movieId}`);
+    if (!movieId)
+        throw new Error(`Peticion invalida}`);
+    let response = await getMovieDetails(movieId);
+    console.log("Detalles obtenidos:", response);
 });
 initApp();
 //# sourceMappingURL=index.js.map

@@ -1,4 +1,5 @@
 import type {MovieResponse} from '../types/movie.types.js';
+import type { MovieDetails } from '../types/movie.types.js';
 
 const apiKey = 'bf83fd724b1b4e6b14b244bdd2527992';
 const url = `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=es-ES&page=1`;
@@ -29,4 +30,19 @@ export const searchMovies = async(query : string): Promise <MovieResponse> => {
         console.error('Fallos en la peticion: ' , error);
         throw error;
     }   
-}
+};
+
+export const getMovieDetails = async(id:string|number):Promise<MovieDetails> => {
+    try{
+        const response = await fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${apiKey}&language=es-ES`);
+        if(!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+    
+        const movieDetails : MovieDetails = await response.json();
+        return movieDetails;
+    
+    }catch(error){
+        console.error('Fallos en la peticion: ' , error);
+        throw error;
+    }
+
+};
