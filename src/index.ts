@@ -3,7 +3,8 @@ import { searchMovies } from "./services/movie.service.js";
 import { getMovieDetails } from "./services/movie.service.js";
 import type { Movie, MovieResponse,MovieDetails } from "./types/movie.types.js";
 
-const movieContainer = document.querySelector("#movies-container");
+const movieContainer = document.querySelector("#catalog-view");
+const movieDetails = document.querySelector("#detail-view");
 //INICIAR LA APP Y MOSTRAR LAS PELICULAS
 
 const renderMovies = (movies : Movie[]): void => {
@@ -29,6 +30,25 @@ const renderMovies = (movies : Movie[]): void => {
     }
     movieContainer.innerHTML = movieList;
 
+}
+
+const renderMovieDetails = (movie : MovieDetails):void => {
+    if(!movieDetails) return;
+    const posterUrl = movie.poster_path 
+            ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` 
+            : 'https://via.placeholder.com/500x750?text=No+Image';
+
+    movieDetails.innerHTML = `<h1>Title: ${movie.title}</h1> 
+        <button id="back-btn">Volver</button>
+        <img src="${posterUrl}"/>
+        <h3>Rating: ${movie.vote_average} || Time: ${movie.runtime} || Genres: ${movie.genres.map(g => g.name).join(",")}</h3>
+        <h4>Overview</h4>
+        <hr></hr>
+        <p>${movie.overview}</p>
+    `;
+    movieContainer?.classList.add("hidden");
+    movieDetails.classList.remove("hidden");
+    
 }
 
 const initApp = async () => {
@@ -63,7 +83,16 @@ movieContainer?.addEventListener("click",async (e) => {
     const movieId = card.dataset.id;
     if(!movieId) throw new Error(`Peticion invalida}`);
     let response =await getMovieDetails(movieId);
-    console.log("Detalles obtenidos:" , response);
+    renderMovieDetails(response);
+});
+
+//MOVIE DETAILS BUTTON VOLVER
+movieDetails?.addEventListener("click", (e) => {
+  const target = e.target as HTMLElement;
+  if (target.closest("#back-btn")) {
+    movieDetails.classList.add("hidden");
+    movieContainer?.classList.remove("hidden");
+  }
 });
 
 initApp();

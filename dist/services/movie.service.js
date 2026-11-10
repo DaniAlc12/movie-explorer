@@ -30,8 +30,6 @@ export const searchMovies = async (query) => {
 };
 export const getMovieDetails = async (id) => {
     try {
-        if (!id)
-            throw new Error(`Peticion invalida}`);
         const response = await fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${apiKey}&language=es-ES`);
         if (!response.ok)
             throw new Error(`Error HTTP: ${response.status}`);

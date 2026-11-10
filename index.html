@@ -1,16 +1,24 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Movie Explorer</title>
-</head>
-<body>
-    <h1>Movie list</h1>
-    <form id="search-form">
-        <input type="text" id="search-input" placeholder="Buscar pelicula...">
-    </form>
-    <div id="movies-container"></div>
-</body>
-<script type="module" src="./dist/index.js"></script>
+    <style>
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="catalog-view">
+      <h1>Movie List</h1>
+      <form id="search-form">
+        <input type="text" id="search-input" placeholder="Buscar pelicula..." />
+      </form>
+      <div id="movies-container"></div>
+    </div>
+    <div id="detail-view" class="hidden"></div>
+  </body>
+  <script type="module" src="./dist/index.js"></script>
 </html>
