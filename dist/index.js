@@ -1,8 +1,8 @@
 import { getPopularMovies } from "./services/movie.service.js";
 import { searchMovies } from "./services/movie.service.js";
+const movieContainer = document.querySelector("#movies-container");
 //INICIAR LA APP Y MOSTRAR LAS PELICULAS
 const renderMovies = (movies) => {
-    const movieContainer = document.querySelector("#movies-container");
     if (!movieContainer)
         return;
     let movieList = "";
@@ -44,6 +44,15 @@ searchInput?.addEventListener("input", (e) => {
             renderMovies(response.results);
         }
     }, 500);
+});
+//CLICK EN PELICULA
+movieContainer?.addEventListener("click", (e) => {
+    const target = e.target;
+    const card = target.closest(".movie-card");
+    if (!card)
+        return;
+    const movieId = card.dataset.id;
+    console.log(`ID de la pelicula: ${movieId}`);
 });
 initApp();
 //# sourceMappingURL=index.js.map
