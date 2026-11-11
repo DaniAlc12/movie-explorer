@@ -1,5 +1,5 @@
 const apiKey = 'bf83fd724b1b4e6b14b244bdd2527992';
-const url = `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=es-ES&page=1`;
+const url = `https://api.themoviedb.or/3/movie/popular?api_key=${apiKey}&language=es-ES&page=1`;
 export const getPopularMovies = async () => {
     try {
         const response = await fetch(url);

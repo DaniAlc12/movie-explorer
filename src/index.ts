@@ -161,10 +161,20 @@ catalogView.addEventListener("click",async (e) => {
 });
 
 const renderLoading = (container:HTMLElement):void => {
-    container.innerHTML = `<div class="spinner">Cargando...</div>`
+    container.innerHTML = `
+    <div class="d-flex justify-content-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+        </div>
+    </div>
+    `
 }
 
 const renderError = (container:HTMLElement , message:string):void => {
-    container.innerHTML = `<h2>Error en el sistema : ${message}</h2>`;
+    container.innerHTML = `
+    <div class="alert alert-danger d-flex align-items-center shadow-sm" role="alert">
+        <div>Error en el sistema: ${message}</div>
+    </div>
+    `;
 }
 initApp();
