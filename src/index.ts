@@ -1,8 +1,9 @@
 import { getPopularMovies,searchMovies,getMovieDetails } from "./services/movie.service.js";
-import { isFavorite,toggleFavorite } from "./services/storage.service.js";
+import { getFavoriteIds, isFavorite,toggleFavorite } from "./services/storage.service.js";
 import type { Movie, MovieResponse,MovieDetails } from "./types/movie.types.js";
 
-const movieContainer = document.querySelector("#catalog-view");
+const catalogView = document.querySelector("#catalog-view");
+const movieContainer = document.querySelector("#movies-container");
 const movieDetails = document.querySelector("#detail-view");
 //INICIAR LA APP Y MOSTRAR LAS PELICULAS
 
@@ -48,7 +49,7 @@ const renderMovieDetails = (movie : MovieDetails):void => {
             <p>${movie.overview}</p>
         </div>
     `;
-    movieContainer?.classList.add("hidden");
+    catalogView?.classList.add("hidden");
     movieDetails.classList.remove("hidden");
     
 }
@@ -93,7 +94,7 @@ movieDetails?.addEventListener("click", (e) => {
   const target = e.target as HTMLElement;
   if (target.closest("#back-btn")) {
     movieDetails.classList.add("hidden");
-    movieContainer?.classList.remove("hidden");
+    catalogView?.classList.remove("hidden");
   }
 
   const favBtn = target.closest("#fav-btn") as HTMLButtonElement | null;
@@ -108,6 +109,23 @@ movieDetails?.addEventListener("click", (e) => {
         favBtn.textContent = "🤍 Añadir a favoritos"
     }
   }
+});
+
+//BOTON VER FAVORITOS / VER TODAS
+catalogView?.addEventListener("click",async (e) => {
+    const target = e.target as HTMLElement;
+    if(target.closest("#filter-favs-btn")){
+        let ids:number[] = getFavoriteIds();
+        if(!ids || ids.length === 0){
+            renderMovies([]);
+        }else{
+            const favoritesDetails:MovieDetails[] = await Promise.all(ids.map(id => getMovieDetails(id)))
+            renderMovies(favoritesDetails);
+        }
+    }
+    if(target.closest("#show-all-btn")){
+        initApp();
+    }
 });
 
 initApp();

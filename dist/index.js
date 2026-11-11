@@ -1,6 +1,7 @@
 import { getPopularMovies, searchMovies, getMovieDetails } from "./services/movie.service.js";
-import { isFavorite, toggleFavorite } from "./services/storage.service.js";
-const movieContainer = document.querySelector("#catalog-view");
+import { getFavoriteIds, isFavorite, toggleFavorite } from "./services/storage.service.js";
+const catalogView = document.querySelector("#catalog-view");
+const movieContainer = document.querySelector("#movies-container");
 const movieDetails = document.querySelector("#detail-view");
 //INICIAR LA APP Y MOSTRAR LAS PELICULAS
 const renderMovies = (movies) => {
@@ -42,7 +43,7 @@ const renderMovieDetails = (movie) => {
             <p>${movie.overview}</p>
         </div>
     `;
-    movieContainer?.classList.add("hidden");
+    catalogView?.classList.add("hidden");
     movieDetails.classList.remove("hidden");
 };
 const initApp = async () => {
@@ -83,11 +84,10 @@ movieDetails?.addEventListener("click", (e) => {
     const target = e.target;
     if (target.closest("#back-btn")) {
         movieDetails.classList.add("hidden");
-        movieContainer?.classList.remove("hidden");
+        catalogView?.classList.remove("hidden");
     }
     const favBtn = target.closest("#fav-btn");
     if (favBtn) {
-        const target = e.target;
         const card = target.closest(".movie-card");
         if (!card)
             return;
@@ -99,6 +99,23 @@ movieDetails?.addEventListener("click", (e) => {
         else {
             favBtn.textContent = "🤍 Añadir a favoritos";
         }
+    }
+});
+//BOTON VER FAVORITOS / VER TODAS
+catalogView?.addEventListener("click", async (e) => {
+    const target = e.target;
+    if (target.closest("#filter-favs-btn")) {
+        let ids = getFavoriteIds();
+        if (!ids || ids.length === 0) {
+            renderMovies([]);
+        }
+        else {
+            const favoritesDetails = await Promise.all(ids.map(id => getMovieDetails(id)));
+            renderMovies(favoritesDetails);
+        }
+    }
+    if (target.closest("#show-all-btn")) {
+        initApp();
     }
 });
 initApp();
