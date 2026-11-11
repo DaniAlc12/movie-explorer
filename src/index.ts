@@ -1,6 +1,5 @@
-import { getPopularMovies } from "./services/movie.service.js";
-import { searchMovies } from "./services/movie.service.js";
-import { getMovieDetails } from "./services/movie.service.js";
+import { getPopularMovies,searchMovies,getMovieDetails } from "./services/movie.service.js";
+import { isFavorite,toggleFavorite } from "./services/storage.service.js";
 import type { Movie, MovieResponse,MovieDetails } from "./types/movie.types.js";
 
 const movieContainer = document.querySelector("#catalog-view");
@@ -38,13 +37,16 @@ const renderMovieDetails = (movie : MovieDetails):void => {
             ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` 
             : 'https://via.placeholder.com/500x750?text=No+Image';
 
-    movieDetails.innerHTML = `<h1>Title: ${movie.title}</h1> 
-        <button id="back-btn">Volver</button>
-        <img src="${posterUrl}"/>
-        <h3>Rating: ${movie.vote_average} || Time: ${movie.runtime} || Genres: ${movie.genres.map(g => g.name).join(",")}</h3>
-        <h4>Overview</h4>
-        <hr></hr>
-        <p>${movie.overview}</p>
+    movieDetails.innerHTML = `<div class="movie-card" data-id="${movie.id}">
+            <h1>Title: ${movie.title}</h1> 
+            <button id="back-btn">Volver</button>
+            <img src="${posterUrl}"/>
+            <h3>Rating: ${movie.vote_average} || Time: ${movie.runtime} || Genres: ${movie.genres.map(g => g.name).join(",")}</h3>
+            <button id="fav-btn">${isFavorite(movie.id) ? "❤️ Quitar de favoritos" : "🤍 Añadir a favoritos"}</button>
+            <h4>Overview</h4>
+            <hr></hr>
+            <p>${movie.overview}</p>
+        </div>
     `;
     movieContainer?.classList.add("hidden");
     movieDetails.classList.remove("hidden");
@@ -86,12 +88,25 @@ movieContainer?.addEventListener("click",async (e) => {
     renderMovieDetails(response);
 });
 
-//MOVIE DETAILS BUTTON VOLVER
+//MOVIE DETAILS BUTTON VOLVER Y FAVORIOS
 movieDetails?.addEventListener("click", (e) => {
   const target = e.target as HTMLElement;
   if (target.closest("#back-btn")) {
     movieDetails.classList.add("hidden");
     movieContainer?.classList.remove("hidden");
+  }
+
+  const favBtn = target.closest("#fav-btn") as HTMLButtonElement | null;
+  if(favBtn){
+    const card = target.closest(".movie-card") as HTMLElement | null;
+    if(!card) return
+    const movieId = Number(card.dataset.id);
+    toggleFavorite(movieId);
+    if(isFavorite(movieId)){
+        favBtn.textContent = "❤️ Quitar de favoritos"
+    }else{
+        favBtn.textContent = "🤍 Añadir a favoritos"
+    }
   }
 });
 
