@@ -19,11 +19,11 @@ const renderMovies = (movies : Movie[]): void => {
             : 'https://via.placeholder.com/500x750?text=No+Image';
             
             movieList += `<div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                <div class="card movie-card h-100 bg-secondary text-white border-0 shadow" data-id="${movie.id}">
+                <div class="card movie-card h-100 bg-dark border border-secondary shadow-sm text-white border-0 shadow" data-id="${movie.id}">
                 <img src="${posterUrl}" class="card-img-top"/> 
                     <div class="card-body d-flex flex-column justify-content-between>   
-                        <h5 class="card-title">Movie title : ${movie.title}</h5>
-                        <p class="card-text mb-1">Release Date : ${movie.release_date}</p>
+                        <h5 class="card-title fw-bold text-secondary">${movie.title}</h5>
+                        <p class="card-text mb-1 fw-bold text-secondary">${movie.release_date}</p>
                         <div>
                             <span class="badge bg-warning text-dark">Vote Average : ${movie.vote_average}</span>
                         </div>
@@ -49,12 +49,15 @@ const renderMovieDetails = (movie : MovieDetails):void => {
             <div class="col-md-8">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h2>Title: ${movie.title}</h2> 
-                    <button id="back-btn">Volver</button>
+                    <button id="back-btn" class="btn text-white btn-primary">Volver</button>
                 </div>
-                <h3>Rating: ${movie.vote_average} || Time: ${movie.runtime} || Genres: ${movie.genres.map(g => g.name).join(",")}</h3>
-                <button id="fav-btn" data-id="${movie.id}">${isFavorite(movie.id) ? "❤️ Quitar de favoritos" : "🤍 Añadir a favoritos"}</button>
-                <h4>Overview</h4>
-                <hr></hr>
+                <div class="my-3 d-flex gap-2 flex-wrap">
+                    <span class="badge bg-warning text-dark">Rating ${movie.vote_average}</span>
+                    <span class="badge bg-secondary">Duracion ${movie.runtime} min</span>
+                    <span class="badge bg-dark border border-secondary">${movie.genres.map(g => g.name).join(", ")}</span>
+                </div>
+                <button id="fav-btn" data-id="${movie.id}" class="btn text-white btn-primary">${isFavorite(movie.id) ? "❤️ Quitar de favoritos" : "🤍 Añadir a favoritos"}</button>
+                <h4 class="mt-4">Overview</h4>
                 <p>${movie.overview}</p>
             </div>
         </div>
