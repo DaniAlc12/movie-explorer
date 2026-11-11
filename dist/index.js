@@ -34,15 +34,22 @@ const renderMovieDetails = (movie) => {
     const posterUrl = movie.poster_path
         ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
         : 'https://via.placeholder.com/500x750?text=No+Image';
-    movieDetails.innerHTML = `<div class="movie-card" data-id="${movie.id}">
-            <h1>Title: ${movie.title}</h1> 
-            <button id="back-btn">Volver</button>
-            <img src="${posterUrl}"/>
-            <h3>Rating: ${movie.vote_average} || Time: ${movie.runtime} || Genres: ${movie.genres.map(g => g.name).join(",")}</h3>
-            <button id="fav-btn">${isFavorite(movie.id) ? "❤️ Quitar de favoritos" : "🤍 Añadir a favoritos"}</button>
-            <h4>Overview</h4>
-            <hr></hr>
-            <p>${movie.overview}</p>
+    movieDetails.innerHTML = `
+        <div class="row g-4 align-items-start">
+            <div class="col-md-4">
+                <img src="${posterUrl}" class="img-fluid rounded shadow"/>
+            </div>
+            <div class="col-md-8">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2>Title: ${movie.title}</h2> 
+                    <button id="back-btn">Volver</button>
+                </div>
+                <h3>Rating: ${movie.vote_average} || Time: ${movie.runtime} || Genres: ${movie.genres.map(g => g.name).join(",")}</h3>
+                <button id="fav-btn" data-id="${movie.id}">${isFavorite(movie.id) ? "❤️ Quitar de favoritos" : "🤍 Añadir a favoritos"}</button>
+                <h4>Overview</h4>
+                <hr></hr>
+                <p>${movie.overview}</p>
+            </div>
         </div>
     `;
     catalogView.classList.add("hidden");
@@ -103,7 +110,7 @@ movieContainer?.addEventListener("click", async (e) => {
         renderError(movieContainer, message);
     }
 });
-//MOVIE DETAILS BUTTON VOLVER Y FAVORIOS
+//MOVIE DETAILS BUTTON VOLVER Y FAVORITOS
 movieDetails?.addEventListener("click", (e) => {
     const target = e.target;
     if (target.closest("#back-btn")) {
@@ -111,18 +118,15 @@ movieDetails?.addEventListener("click", (e) => {
         catalogView.classList.remove("hidden");
     }
     const favBtn = target.closest("#fav-btn");
-    if (favBtn) {
-        const card = target.closest(".movie-card");
-        if (!card)
-            return;
-        const movieId = Number(card.dataset.id);
-        toggleFavorite(movieId);
-        if (isFavorite(movieId)) {
-            favBtn.textContent = "❤️ Quitar de favoritos";
-        }
-        else {
-            favBtn.textContent = "🤍 Añadir a favoritos";
-        }
+    if (!favBtn)
+        return;
+    const movieId = Number(favBtn.dataset.id);
+    toggleFavorite(movieId);
+    if (isFavorite(movieId)) {
+        favBtn.textContent = "❤️ Quitar de favoritos";
+    }
+    else {
+        favBtn.textContent = "🤍 Añadir a favoritos";
     }
 });
 //BOTON VER FAVORITOS / VER TODAS
