@@ -46,15 +46,20 @@ const renderMovieDetails = (movie : MovieDetails):void => {
             <p>${movie.overview}</p>
         </div>
     `;
-    catalogView?.classList.add("hidden");
+    catalogView.classList.add("hidden");
     movieDetails.classList.remove("hidden");
     
 }
 
 const initApp = async () => {
-    renderLoading(movieContainer);
-    const movies: MovieResponse = await getPopularMovies();
-    renderMovies(movies.results);
+    try{
+        renderLoading(movieContainer);
+        const movies: MovieResponse = await getPopularMovies();
+        renderMovies(movies.results);
+    }catch (error) {
+        const message = error instanceof Error ? error.message : "Ocurrió un error inesperado";
+        renderError(movieContainer, message);   
+    }
 };
 
 //BARRA DE BUSQUEDA
@@ -66,27 +71,37 @@ searchInput?.addEventListener("input", (e) => {
     clearTimeout(timeOutId);
 
     timeOutId = window.setTimeout(async () => {
-        if(value.trim() === ""){
-            renderLoading(movieContainer);
-            let response = await getPopularMovies();
-            renderMovies(response.results);
-        }else{
-            renderLoading(movieContainer);
-            let response = await searchMovies(value);
-            renderMovies(response.results);
+        try{
+            if(value.trim() === ""){
+                renderLoading(movieContainer);
+                let response = await getPopularMovies();
+                renderMovies(response.results);
+            }else{
+                renderLoading(movieContainer);
+                let response = await searchMovies(value);
+                renderMovies(response.results);
+            }
+        }catch (error) {
+            const message = error instanceof Error ? error.message : "Ocurrió un error inesperado";
+            renderError(movieContainer, message);  
         }
-    }, 500);
+    }, 500); 
 });
 
 //CLICK EN PELICULA
 movieContainer?.addEventListener("click",async (e) => {
-    const target = e.target as HTMLElement;
-    const card = target.closest(".movie-card") as HTMLElement | null;
-    if(!card) return
-    const movieId = card.dataset.id;
-    if(!movieId) throw new Error(`Peticion invalida}`);
-    let response =await getMovieDetails(movieId);
-    renderMovieDetails(response);
+    try{
+        const target = e.target as HTMLElement;
+        const card = target.closest(".movie-card") as HTMLElement | null;
+        if(!card) return
+        const movieId = card.dataset.id;
+        if(!movieId) throw new Error(`Peticion invalida}`);
+        let response =await getMovieDetails(movieId);
+        renderMovieDetails(response);
+    }catch (error) {
+        const message = error instanceof Error ? error.message : "Ocurrió un error inesperado";
+        renderError(movieContainer, message);   
+    }
 });
 
 //MOVIE DETAILS BUTTON VOLVER Y FAVORIOS
@@ -94,7 +109,7 @@ movieDetails?.addEventListener("click", (e) => {
   const target = e.target as HTMLElement;
   if (target.closest("#back-btn")) {
     movieDetails.classList.add("hidden");
-    catalogView?.classList.remove("hidden");
+    catalogView.classList.remove("hidden");
   }
 
   const favBtn = target.closest("#fav-btn") as HTMLButtonElement | null;
@@ -112,20 +127,25 @@ movieDetails?.addEventListener("click", (e) => {
 });
 
 //BOTON VER FAVORITOS / VER TODAS
-catalogView?.addEventListener("click",async (e) => {
-    const target = e.target as HTMLElement;
-    if(target.closest("#filter-favs-btn")){
-        let ids:number[] = getFavoriteIds();
-        if(!ids || ids.length === 0){
-            renderMovies([]);
-        }else{
-            renderLoading(movieContainer);
-            const favoritesDetails:MovieDetails[] = await Promise.all(ids.map(id => getMovieDetails(id)))
-            renderMovies(favoritesDetails);
+catalogView.addEventListener("click",async (e) => {
+    try{
+        const target = e.target as HTMLElement;
+        if(target.closest("#filter-favs-btn")){
+            let ids:number[] = getFavoriteIds();
+            if(!ids || ids.length === 0){
+                renderMovies([]);
+            }else{
+                renderLoading(movieContainer);
+                const favoritesDetails:MovieDetails[] = await Promise.all(ids.map(id => getMovieDetails(id)))
+                renderMovies(favoritesDetails);
+            }
         }
-    }
-    if(target.closest("#show-all-btn")){
-        initApp();
+        if(target.closest("#show-all-btn")){
+            initApp();
+        }
+    }catch (error) {
+        const message = error instanceof Error ? error.message : "Ocurrió un error inesperado";
+        renderError(movieContainer, message);   
     }
 });
 
@@ -133,4 +153,7 @@ const renderLoading = (container:HTMLElement):void => {
     container.innerHTML = `<div class="spinner">Cargando...</div>`
 }
 
+const renderError = (container:HTMLElement , message:string):void => {
+    container.innerHTML = `<h2>Error en el sistema : ${message}</h2>`;
+}
 initApp();

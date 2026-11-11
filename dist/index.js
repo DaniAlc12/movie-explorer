@@ -39,13 +39,19 @@ const renderMovieDetails = (movie) => {
             <p>${movie.overview}</p>
         </div>
     `;
-    catalogView?.classList.add("hidden");
+    catalogView.classList.add("hidden");
     movieDetails.classList.remove("hidden");
 };
 const initApp = async () => {
-    renderLoading(movieContainer);
-    const movies = await getPopularMovies();
-    renderMovies(movies.results);
+    try {
+        renderLoading(movieContainer);
+        const movies = await getPopularMovies();
+        renderMovies(movies.results);
+    }
+    catch (error) {
+        const message = error instanceof Error ? error.message : "Ocurrió un error inesperado";
+        renderError(movieContainer, message);
+    }
 };
 //BARRA DE BUSQUEDA
 let timeOutId;
@@ -54,36 +60,48 @@ searchInput?.addEventListener("input", (e) => {
     const value = e.target.value;
     clearTimeout(timeOutId);
     timeOutId = window.setTimeout(async () => {
-        if (value.trim() === "") {
-            renderLoading(movieContainer);
-            let response = await getPopularMovies();
-            renderMovies(response.results);
+        try {
+            if (value.trim() === "") {
+                renderLoading(movieContainer);
+                let response = await getPopularMovies();
+                renderMovies(response.results);
+            }
+            else {
+                renderLoading(movieContainer);
+                let response = await searchMovies(value);
+                renderMovies(response.results);
+            }
         }
-        else {
-            renderLoading(movieContainer);
-            let response = await searchMovies(value);
-            renderMovies(response.results);
+        catch (error) {
+            const message = error instanceof Error ? error.message : "Ocurrió un error inesperado";
+            renderError(movieContainer, message);
         }
     }, 500);
 });
 //CLICK EN PELICULA
 movieContainer?.addEventListener("click", async (e) => {
-    const target = e.target;
-    const card = target.closest(".movie-card");
-    if (!card)
-        return;
-    const movieId = card.dataset.id;
-    if (!movieId)
-        throw new Error(`Peticion invalida}`);
-    let response = await getMovieDetails(movieId);
-    renderMovieDetails(response);
+    try {
+        const target = e.target;
+        const card = target.closest(".movie-card");
+        if (!card)
+            return;
+        const movieId = card.dataset.id;
+        if (!movieId)
+            throw new Error(`Peticion invalida}`);
+        let response = await getMovieDetails(movieId);
+        renderMovieDetails(response);
+    }
+    catch (error) {
+        const message = error instanceof Error ? error.message : "Ocurrió un error inesperado";
+        renderError(movieContainer, message);
+    }
 });
 //MOVIE DETAILS BUTTON VOLVER Y FAVORIOS
 movieDetails?.addEventListener("click", (e) => {
     const target = e.target;
     if (target.closest("#back-btn")) {
         movieDetails.classList.add("hidden");
-        catalogView?.classList.remove("hidden");
+        catalogView.classList.remove("hidden");
     }
     const favBtn = target.closest("#fav-btn");
     if (favBtn) {
@@ -101,25 +119,34 @@ movieDetails?.addEventListener("click", (e) => {
     }
 });
 //BOTON VER FAVORITOS / VER TODAS
-catalogView?.addEventListener("click", async (e) => {
-    const target = e.target;
-    if (target.closest("#filter-favs-btn")) {
-        let ids = getFavoriteIds();
-        if (!ids || ids.length === 0) {
-            renderMovies([]);
+catalogView.addEventListener("click", async (e) => {
+    try {
+        const target = e.target;
+        if (target.closest("#filter-favs-btn")) {
+            let ids = getFavoriteIds();
+            if (!ids || ids.length === 0) {
+                renderMovies([]);
+            }
+            else {
+                renderLoading(movieContainer);
+                const favoritesDetails = await Promise.all(ids.map(id => getMovieDetails(id)));
+                renderMovies(favoritesDetails);
+            }
         }
-        else {
-            renderLoading(movieContainer);
-            const favoritesDetails = await Promise.all(ids.map(id => getMovieDetails(id)));
-            renderMovies(favoritesDetails);
+        if (target.closest("#show-all-btn")) {
+            initApp();
         }
     }
-    if (target.closest("#show-all-btn")) {
-        initApp();
+    catch (error) {
+        const message = error instanceof Error ? error.message : "Ocurrió un error inesperado";
+        renderError(movieContainer, message);
     }
 });
 const renderLoading = (container) => {
     container.innerHTML = `<div class="spinner">Cargando...</div>`;
+};
+const renderError = (container, message) => {
+    container.innerHTML = `<h2>Error en el sistema : ${message}</h2>`;
 };
 initApp();
 //# sourceMappingURL=index.js.map
