@@ -2,14 +2,12 @@ import { getPopularMovies,searchMovies,getMovieDetails } from "./services/movie.
 import { getFavoriteIds, isFavorite,toggleFavorite } from "./services/storage.service.js";
 import type { Movie, MovieResponse,MovieDetails } from "./types/movie.types.js";
 
-const catalogView = document.querySelector("#catalog-view");
-const movieContainer = document.querySelector("#movies-container");
-const movieDetails = document.querySelector("#detail-view");
+const catalogView = document.querySelector<HTMLElement>("#catalog-view")!;
+const movieContainer = document.querySelector<HTMLElement>("#movies-container")!;
+const movieDetails = document.querySelector<HTMLElement>("#detail-view")!;
 //INICIAR LA APP Y MOSTRAR LAS PELICULAS
 
 const renderMovies = (movies : Movie[]): void => {
-    if (!movieContainer) return;
-
     let movieList: string = "";
 
     if(movies.length === 0){
@@ -33,7 +31,6 @@ const renderMovies = (movies : Movie[]): void => {
 }
 
 const renderMovieDetails = (movie : MovieDetails):void => {
-    if(!movieDetails) return;
     const posterUrl = movie.poster_path 
             ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` 
             : 'https://via.placeholder.com/500x750?text=No+Image';
@@ -55,6 +52,7 @@ const renderMovieDetails = (movie : MovieDetails):void => {
 }
 
 const initApp = async () => {
+    renderLoading(movieContainer);
     const movies: MovieResponse = await getPopularMovies();
     renderMovies(movies.results);
 };
@@ -69,9 +67,11 @@ searchInput?.addEventListener("input", (e) => {
 
     timeOutId = window.setTimeout(async () => {
         if(value.trim() === ""){
+            renderLoading(movieContainer);
             let response = await getPopularMovies();
             renderMovies(response.results);
         }else{
+            renderLoading(movieContainer);
             let response = await searchMovies(value);
             renderMovies(response.results);
         }
@@ -119,6 +119,7 @@ catalogView?.addEventListener("click",async (e) => {
         if(!ids || ids.length === 0){
             renderMovies([]);
         }else{
+            renderLoading(movieContainer);
             const favoritesDetails:MovieDetails[] = await Promise.all(ids.map(id => getMovieDetails(id)))
             renderMovies(favoritesDetails);
         }
@@ -127,5 +128,9 @@ catalogView?.addEventListener("click",async (e) => {
         initApp();
     }
 });
+
+const renderLoading = (container:HTMLElement):void => {
+    container.innerHTML = `<div class="spinner">Cargando...</div>`
+}
 
 initApp();

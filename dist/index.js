@@ -5,8 +5,6 @@ const movieContainer = document.querySelector("#movies-container");
 const movieDetails = document.querySelector("#detail-view");
 //INICIAR LA APP Y MOSTRAR LAS PELICULAS
 const renderMovies = (movies) => {
-    if (!movieContainer)
-        return;
     let movieList = "";
     if (movies.length === 0) {
         movieList = `<h2>No se encontraron peliculas</h2>`;
@@ -27,8 +25,6 @@ const renderMovies = (movies) => {
     movieContainer.innerHTML = movieList;
 };
 const renderMovieDetails = (movie) => {
-    if (!movieDetails)
-        return;
     const posterUrl = movie.poster_path
         ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
         : 'https://via.placeholder.com/500x750?text=No+Image';
@@ -47,6 +43,7 @@ const renderMovieDetails = (movie) => {
     movieDetails.classList.remove("hidden");
 };
 const initApp = async () => {
+    renderLoading(movieContainer);
     const movies = await getPopularMovies();
     renderMovies(movies.results);
 };
@@ -58,10 +55,12 @@ searchInput?.addEventListener("input", (e) => {
     clearTimeout(timeOutId);
     timeOutId = window.setTimeout(async () => {
         if (value.trim() === "") {
+            renderLoading(movieContainer);
             let response = await getPopularMovies();
             renderMovies(response.results);
         }
         else {
+            renderLoading(movieContainer);
             let response = await searchMovies(value);
             renderMovies(response.results);
         }
@@ -110,6 +109,7 @@ catalogView?.addEventListener("click", async (e) => {
             renderMovies([]);
         }
         else {
+            renderLoading(movieContainer);
             const favoritesDetails = await Promise.all(ids.map(id => getMovieDetails(id)));
             renderMovies(favoritesDetails);
         }
@@ -118,5 +118,8 @@ catalogView?.addEventListener("click", async (e) => {
         initApp();
     }
 });
+const renderLoading = (container) => {
+    container.innerHTML = `<div class="spinner">Cargando...</div>`;
+};
 initApp();
 //# sourceMappingURL=index.js.map
