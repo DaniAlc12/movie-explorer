@@ -14,11 +14,17 @@ const renderMovies = (movies) => {
             const posterUrl = movie.poster_path
                 ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
                 : 'https://via.placeholder.com/500x750?text=No+Image';
-            movieList += `<div class="movie-card" data-id="${movie.id}">
-                <h1>Movie title : ${movie.title}</h1>
-                <h2>Vote Average : ${movie.vote_average}</h2>
-                <h2>Release Date : ${movie.release_date}</h2>
-                <img src="${posterUrl}"/>
+            movieList += `<div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                <div class="card movie-card h-100 bg-secondary text-white border-0 shadow" data-id="${movie.id}">
+                <img src="${posterUrl}" class="card-img-top"/> 
+                    <div class="card-body d-flex flex-column justify-content-between>   
+                        <h5 class="card-title">Movie title : ${movie.title}</h5>
+                        <p class="card-text mb-1">Release Date : ${movie.release_date}</p>
+                        <div>
+                            <span class="badge bg-warning text-dark">Vote Average : ${movie.vote_average}</span>
+                        </div>
+                    </div>
+                </div>
             </div>`;
         });
     }
@@ -88,6 +94,7 @@ movieContainer?.addEventListener("click", async (e) => {
         const movieId = card.dataset.id;
         if (!movieId)
             throw new Error(`Peticion invalida}`);
+        console.log("ID capturado en el evento:", movieId);
         let response = await getMovieDetails(movieId);
         renderMovieDetails(response);
     }
